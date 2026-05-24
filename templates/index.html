@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>🌾 Smart Farming Dashboard</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<h1>🌾 Smart Farming Dashboard</h1>
+
+<div class="container">
+
+    <!-- 🌱 Soil Moisture -->
+    <div class="card">
+
+        <h2>🌱 Soil Moisture</h2>
+
+        <p id="moisture"></p>
+
+    </div>
+
+    <!-- 🌡️ Temperature -->
+    <div class="card">
+
+        <h2>🌡️ Temperature</h2>
+
+        <p id="temperature"></p>
+
+    </div>
+
+    <!-- 📏 Plant Height -->
+    <div class="card">
+
+        <h2>📏 Plant Height</h2>
+
+        <p id="height"></p>
+
+    </div>
+
+    <!-- 🍂 Disease -->
+    <div class="card">
+
+        <h2>🍂 Disease Detection</h2>
+
+        <p id="disease"></p>
+
+    </div>
+
+    <!-- 🌦️ Weather -->
+    <div class="card">
+
+        <h2>🌦️ Weather</h2>
+
+        <p id="weather"></p>
+
+    </div>
+
+    <!-- 📍 City -->
+    <div class="card">
+
+        <h2>📍 City</h2>
+
+        <p id="city"></p>
+
+    </div>
+
+    <!-- 🌾 Harvest -->
+    <div class="card">
+
+        <h2>🌾 Harvest Status</h2>
+
+        <p id="harvest"></p>
+
+    </div>
+
+    <!-- 🧪 Fertilizer -->
+    <div class="card">
+
+        <h2>🧪 Fertilizer</h2>
+
+        <p id="fertilizer"></p>
+
+    </div>
+
+    <!-- 📸 Camera -->
+    <div class="card">
+
+        <h2>📸 Camera Preview</h2>
+
+        <img src="/static/leaf.jpg"
+        width="250">
+
+    </div>
+
+</div>
+
+<!-- 📊 Live Graph -->
+<div style="padding:30px;">
+
+    <canvas id="myChart"
+    width="400"
+    height="150"></canvas>
+
+</div>
+
+<!-- 📊 Chart JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- 🔥 Main JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
