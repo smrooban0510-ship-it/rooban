@@ -1,14 +1,159 @@
-let moistureData = []
+async function loadData() {
 
-let tempData = []
+    try {
 
-let labels = []
+        // ===============================
+        // FETCH DATA FROM FLASK
+        // ===============================
 
-// =================================================
-// 📊 CHART SETUP
-// =================================================
+        let response = await fetch('/data');
 
-const ctx = document.getElementById('myChart')
+        let data = await response.json();
+
+        // ===============================
+        // 🌱 SOIL MOISTURE
+        // ===============================
+
+        document.getElementById(
+            "moisture"
+        ).innerText =
+        data.moisture;
+
+        // ===============================
+        // 🌡️ TEMPERATURE
+        // ===============================
+
+        document.getElementById(
+            "temperature"
+        ).innerText =
+        data.temperature + " °C";
+
+        // ===============================
+        // 💧 HUMIDITY
+        // ===============================
+
+        document.getElementById(
+            "humidity"
+        ).innerText =
+        data.humidity + " %";
+
+        // ===============================
+        // 📏 PLANT HEIGHT
+        // ===============================
+
+        document.getElementById(
+            "height"
+        ).innerText =
+        data.height + " cm";
+
+        // ===============================
+        // 🍂 DISEASE DETECTION
+        // ===============================
+
+        document.getElementById(
+            "disease"
+        ).innerText =
+        data.disease;
+
+        // ===============================
+        // 🌦️ WEATHER
+        // ===============================
+
+        document.getElementById(
+            "weather"
+        ).innerText =
+        data.weather + " / " +
+        data.outside_temp + " °C";
+
+        // ===============================
+        // ☔ RAIN ALERT
+        // ===============================
+
+        if(data.rain_alert == "Yes"){
+
+            document.getElementById(
+                "rain_alert"
+            ).innerText =
+                "⚠️ Rain Expected";
+
+        }
+        else{
+
+            document.getElementById(
+                "rain_alert"
+            ).innerText =
+                "✅ No Rain";
+
+        }
+
+        // ===============================
+        // 📍 CITY
+        // ===============================
+
+        document.getElementById(
+            "city"
+        ).innerText =
+        data.city;
+
+        // ===============================
+        // 🌾 HARVEST STATUS
+        // ===============================
+
+        document.getElementById(
+            "harvest"
+        ).innerText =
+        data.harvest;
+
+        // ===============================
+        // 🧪 FERTILIZER
+        // ===============================
+
+        document.getElementById(
+            "fertilizer"
+        ).innerText =
+        data.fertilizer;
+
+        // ===============================
+        // 📸 REFRESH CAMERA IMAGE
+        // ===============================
+
+        document.getElementById(
+             "leafImage"
+        ).src =
+        "http://10.150.81.177:5001/camera" +
+        new Date().getTime();
+        // ===============================
+        // 📊 UPDATE CHART
+        // ===============================
+
+        updateChart(
+
+            data.moisture,
+
+            data.temperature,
+
+            data.height
+        );
+
+    }
+
+    catch(error){
+
+        console.log(
+            "Dashboard Error:",
+            error
+        );
+
+    }
+}
+
+// =======================================
+// 📊 CHART JS
+// =======================================
+
+const ctx = document.getElementById(
+    'myChart'
+).getContext('2d');
 
 const myChart = new Chart(ctx, {
 
@@ -16,111 +161,124 @@ const myChart = new Chart(ctx, {
 
     data: {
 
-        labels: labels,
+        labels: [],
 
         datasets: [
 
             {
-
                 label: 'Soil Moisture',
 
-                data: moistureData,
+                data: [],
 
-                borderWidth: 3
+                borderWidth: 3,
+
+                tension: 0.4
             },
 
             {
-
                 label: 'Temperature',
 
-                data: tempData,
+                data: [],
 
-                borderWidth: 3
+                borderWidth: 3,
+
+                tension: 0.4
+            },
+
+            {
+                label: 'Plant Height',
+
+                data: [],
+
+                borderWidth: 3,
+
+                tension: 0.4
             }
         ]
     },
 
     options: {
 
-        responsive: true
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true
+            }
+        }
     }
-})
+});
 
-// =================================================
-// 🔄 LOAD DATA
-// =================================================
+// =======================================
+// 📈 UPDATE CHART
+// =======================================
 
-async function loadData(){
+function updateChart(
 
-    let response = await fetch("/data")
+    moisture,
 
-    let data = await response.json()
+    temperature,
 
-    // 🌱 Soil Moisture
-    document.getElementById("moisture").innerText =
-    data.moisture
+    height
+){
 
-    // 🌡️ Temperature
-    document.getElementById("temperature").innerText =
-    data.temperature + "°C"
+    let time = new Date()
+    .toLocaleTimeString();
 
-    // 📏 Plant Height
-    document.getElementById("height").innerText =
-    data.height + " cm"
+    // ===============================
+    // ADD NEW VALUES
+    // ===============================
 
-    // 🍂 Disease
-    document.getElementById("disease").innerText =
-    data.disease
+    myChart.data.labels.push(time);
 
-    // 🌦️ Real Weather
-    document.getElementById("weather").innerText =
-    data.weather + " " + data.outside_temp + "°C"
+    myChart.data.datasets[0]
+    .data.push(moisture);
 
-    // 📍 City
-    document.getElementById("city").innerText =
-    data.city
+    myChart.data.datasets[1]
+    .data.push(temperature);
 
-    // 🌾 Harvest
-    document.getElementById("harvest").innerText =
-    data.harvest
+    myChart.data.datasets[2]
+    .data.push(height);
 
-    // 🧪 Fertilizer
-    document.getElementById("fertilizer").innerText =
-    data.fertilizer
+    // ===============================
+    // KEEP ONLY LAST 10 VALUES
+    // ===============================
 
-    // 📸 Camera Refresh
-    let img = document.querySelector("img")
+    if(
+        myChart.data.labels.length > 10
+    ){
 
-    img.src = "/static/leaf.jpg?" + new Date().getTime()
+        myChart.data.labels.shift();
 
-    // =================================================
-    // 📊 GRAPH UPDATE
-    // =================================================
+        myChart.data.datasets[0]
+        .data.shift();
 
-    let time =
-    new Date().toLocaleTimeString()
+        myChart.data.datasets[1]
+        .data.shift();
 
-    labels.push(time)
-
-    moistureData.push(data.moisture)
-
-    tempData.push(data.temperature)
-
-    // Keep only 10 points
-    if(labels.length > 10){
-
-        labels.shift()
-
-        moistureData.shift()
-
-        tempData.shift()
+        myChart.data.datasets[2]
+        .data.shift();
     }
 
-    myChart.update()
+    // ===============================
+    // REFRESH GRAPH
+    // ===============================
+
+    myChart.update();
 }
 
-// Update every 60 seconds
-setInterval(loadData,60000)
+// =======================================
+// 🚀 FIRST LOAD
+// =======================================
 
-// First load
-loadData()
+loadData();
+
+// =======================================
+// 🔄 AUTO REFRESH
+// =======================================
+
+setInterval(loadData, 5000);

@@ -3,117 +3,319 @@
 
 <head>
 
-    <title>🌾 Smart Farming Dashboard</title>
+    <title>🌱 Smart Agriculture Dashboard</title>
 
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+    <style>
+
+        body{
+
+            font-family: Arial;
+
+            background: #e8f5e9;
+
+            padding: 20px;
+
+            margin: 0;
+        }
+
+        h1{
+
+            text-align: center;
+
+            color: green;
+        }
+
+        .container{
+
+            display: grid;
+
+            grid-template-columns:
+            repeat(auto-fit,minmax(250px,1fr));
+
+            gap: 20px;
+        }
+
+        .card{
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            box-shadow: 0px 0px 10px gray;
+
+            text-align: center;
+        }
+
+        .card h2{
+
+            color: #2e7d32;
+        }
+
+        img{
+
+            border-radius: 10px;
+
+            margin-top: 10px;
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<h1>🌾 Smart Farming Dashboard</h1>
+    <h1>🌱 Smart Agriculture Dashboard</h1>
 
-<div class="container">
+    <div class="container">
 
-    <!-- 🌱 Soil Moisture -->
-    <div class="card">
+        <!-- 📍 City -->
+        <div class="card">
 
-        <h2>🌱 Soil Moisture</h2>
+            <h2>📍 City</h2>
 
-        <p id="moisture"></p>
+            <h1 id="city">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🌱 Soil Moisture -->
+        <div class="card">
+
+            <h2>🌱 Soil Moisture</h2>
+
+            <h1 id="moisture">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🌡️ Temperature -->
+        <div class="card">
+
+            <h2>🌡️ Temperature</h2>
+
+            <h1 id="temperature">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 💧 Humidity -->
+        <div class="card">
+
+            <h2>💧 Humidity</h2>
+
+            <h1 id="humidity">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 📏 Plant Height -->
+        <div class="card">
+
+            <h2>📏 Plant Height</h2>
+
+            <h1 id="height">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🍂 Disease -->
+        <div class="card">
+
+            <h2>🍂 Disease Detection</h2>
+
+            <h1 id="disease">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🌦️ Weather -->
+        <div class="card">
+
+            <h2>🌦️ Weather</h2>
+
+            <h1 id="weather">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- ☔ Rain Alert -->
+        <div class="card">
+
+            <h2>☔ Rain Alert</h2>
+
+            <h1 id="rain_alert">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🌾 Harvest -->
+        <div class="card">
+
+            <h2>🌾 Harvest Status</h2>
+
+            <h1 id="harvest">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 🧪 Fertilizer -->
+        <div class="card">
+
+            <h2>🧪 Fertilizer</h2>
+
+            <h1 id="fertilizer">
+                Loading...
+            </h1>
+
+        </div>
+
+        <!-- 📸 Camera -->
+        <div class="card">
+
+            <h2>📸 Live Leaf Image</h2>
+
+            <img
+                src="http://10.150.81.177:5001/camera"
+                width="300"
+                id="leafImage"
+            >
+
+
+        </div>
 
     </div>
 
-    <!-- 🌡️ Temperature -->
-    <div class="card">
+    <script>
 
-        <h2>🌡️ Temperature</h2>
+        // =====================================
+        // LOAD DASHBOARD DATA
+        // =====================================
 
-        <p id="temperature"></p>
+        async function loadData(){
 
-    </div>
+            try{
 
-    <!-- 📏 Plant Height -->
-    <div class="card">
+                let response =
+                await fetch('/data');
 
-        <h2>📏 Plant Height</h2>
+                let data =
+                await response.json();
 
-        <p id="height"></p>
+                // 📍 City
+                document.getElementById(
+                    "city"
+                ).innerText =
+                data.city;
 
-    </div>
+                // 🌱 Moisture
+                document.getElementById(
+                    "moisture"
+                ).innerText =
+                data.moisture;
 
-    <!-- 🍂 Disease -->
-    <div class="card">
+                // 🌡️ Temperature
+                document.getElementById(
+                    "temperature"
+                ).innerText =
+                data.temperature + " °C";
 
-        <h2>🍂 Disease Detection</h2>
+                // 💧 Humidity
+                document.getElementById(
+                    "humidity"
+                ).innerText =
+                data.humidity + " %";
 
-        <p id="disease"></p>
+                // 📏 Height
+                document.getElementById(
+                    "height"
+                ).innerText =
+                data.height + " cm";
 
-    </div>
+                // 🍂 Disease
+                document.getElementById(
+                    "disease"
+                ).innerText =
+                data.disease;
 
-    <!-- 🌦️ Weather -->
-    <div class="card">
+                // 🌦️ Weather
+                document.getElementById(
+                    "weather"
+                ).innerText =
+                data.weather + " / " +
+                data.outside_temp + " °C";
 
-        <h2>🌦️ Weather</h2>
+                // ☔ Rain Alert
+            if(data.rain_alert == "Yes"){
 
-        <p id="weather"></p>
+                document.getElementById(
+                    "rain_alert"
+                ).innerText =
+                    "⚠️ Rain Expected";
 
-    </div>
+            }
+            else{
 
-    <!-- 📍 City -->
-    <div class="card">
+                document.getElementById(
+                    "rain_alert"
+                ).innerText =
+                        "✅ No Rain";
+            }
 
-        <h2>📍 City</h2>
+                // 🌾 Harvest
+                document.getElementById(
+                    "harvest"
+                ).innerText =
+                data.harvest;
 
-        <p id="city"></p>
+                // 🧪 Fertilizer
+                document.getElementById(
+                    "fertilizer"
+                ).innerText =
+                data.fertilizer;
 
-    </div>
+                // 📸 Refresh Image
+                document.getElementById(
+                    "leafImage"
+                ).src =
+                "/static/leaf.jpg?" +
+                new Date().getTime();
 
-    <!-- 🌾 Harvest -->
-    <div class="card">
+            }
 
-        <h2>🌾 Harvest Status</h2>
+            catch(error){
 
-        <p id="harvest"></p>
+                console.log(error);
+            }
+        }
 
-    </div>
+        // =====================================
+        // FIRST LOAD
+        // =====================================
 
-    <!-- 🧪 Fertilizer -->
-    <div class="card">
+        loadData();
 
-        <h2>🧪 Fertilizer</h2>
+        // =====================================
+        // AUTO REFRESH
+        // =====================================
 
-        <p id="fertilizer"></p>
+        setInterval(loadData,5000);
 
-    </div>
-
-    <!-- 📸 Camera -->
-    <div class="card">
-
-        <h2>📸 Camera Preview</h2>
-
-        <img src="/static/leaf.jpg"
-        width="250">
-
-    </div>
-
-</div>
-
-<!-- 📊 Live Graph -->
-<div style="padding:30px;">
-
-    <canvas id="myChart"
-    width="400"
-    height="150"></canvas>
-
-</div>
-
-<!-- 📊 Chart JS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- 🔥 Main JS -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+    </script>
 
 </body>
+
 </html>

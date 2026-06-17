@@ -4,15 +4,15 @@ import tensorflow as tf
 from PIL import Image, ImageOps
 
 import numpy as np
-import random
 import requests
 import cv2
+from flask import Flask, render_template, jsonify, send_file
 
 app = Flask(__name__)
 
-# =====================================================
-# 🤖 LOAD TFLITE MODEL
-# =====================================================
+# ============================================
+# LOAD AI MODEL
+# ============================================
 
 interpreter = tf.lite.Interpreter(
     model_path="model/model.tflite"
@@ -29,28 +29,20 @@ class_names = open(
     "r"
 ).readlines()
 
-# =====================================================
-# 📸 CAMERA CAPTURE
-# =====================================================
+# ============================================
+# CAMERA INITIALIZATION
+# ============================================
 
-def capture_image():
 
-    cam = cv2.VideoCapture(0)
+# ============================================
+# GET CAMERA IMAGE
+# ============================================
 
-    ret, frame = cam.read()
 
-    if ret:
 
-        cv2.imwrite(
-            "static/leaf.jpg",
-            frame
-        )
-
-    cam.release()
-
-# =====================================================
-# 🍂 AI DISEASE DETECTION
-# =====================================================
+# ============================================
+# AI DISEASE DETECTION
+# ============================================
 
 def detect_disease():
 
@@ -93,33 +85,9 @@ def detect_disease():
 
     return disease
 
-# =====================================================
-# 🌱 SOIL MOISTURE
-# =====================================================
-
-def get_moisture():
-
-    return random.randint(200,500)
-
-# =====================================================
-# 🌡️ TEMPERATURE
-# =====================================================
-
-def get_temperature():
-
-    return random.randint(20,40)
-
-# =====================================================
-# 📏 PLANT HEIGHT
-# =====================================================
-
-def get_height():
-
-    return random.randint(10,45)
-
-# =====================================================
-# 🌦️ WEATHER
-# =====================================================
+# ============================================
+# WEATHER API
+# ============================================
 
 def get_weather(city):
 
@@ -143,28 +111,31 @@ def get_weather(city):
 
     return weather, outside_temp
 
-# =====================================================
-# 🌾 HARVEST STATUS
-# =====================================================
+
+# ============================================
+# HARVEST STATUS
+# ============================================
 
 def harvest_status(height):
 
-    if height > 35:
+    if float(height) > 35:
 
-        return "Ready"
+        return "Ready for Harvest"
 
     else:
 
         return "Growing"
 
-# =====================================================
-# 🧪 FERTILIZER RECOMMENDATION
-# =====================================================
+# ============================================
+# FERTILIZER RECOMMENDATION
+# ============================================
 
 def fertilizer_recommendation(
     disease,
     moisture
 ):
+
+    moisture = float(moisture)
 
     if "LeafSpot" in disease:
 
@@ -174,7 +145,7 @@ def fertilizer_recommendation(
 
         return "Sulfur Fungicide"
 
-    elif moisture < 250:
+    elif moisture < 300:
 
         return "Organic Compost"
 
@@ -182,59 +153,137 @@ def fertilizer_recommendation(
 
         return "Urea"
 
-# =====================================================
-# 🏠 HOME PAGE
-# =====================================================
+# ============================================
+# HOME PAGE
+# ============================================
+# ============================================
+# HOME PAGE
+# ============================================
+
+  
+   
+    
+
+
 
 @app.route("/")
+
 def home():
 
     return render_template("index.html")
 
-# =====================================================
-# 📊 LIVE DATA
-# =====================================================
+# ============================================
+# LIVE DATA
+# ============================================
 
 @app.route("/data")
+
 def data():
+    
 
-    # 📸 Capture leaf image
-    capture_image()
+    # GET LATEST CAMERA IMAGE FROM PI
 
-    # 📍 Detect city
+    try:
+        image = requests.get(
+           "https://feof-upgrades-musical-progressive.trycloudflare.com/camera",
+           timeout=5
+        )
+
+
+        with open("static/leaf.jpg", "wb") as f:
+            f.write (image.content)
+    except:
+        pass
+
+    # USER LOCATION
+
+    location = requests.get(
+        "https://ipinfo.io"
+    ).json()
+
+    #capture_image()
+
+    # =====================================
+    # 📍 USER LOCATION
+    # =====================================
+
     location = requests.get(
         "https://ipinfo.io"
     ).json()
 
     city = location["city"]
 
-    # 🌱 Sensor values
-    moisture = get_moisture()
+    # =====================================
+    # 🌱 SENSOR DATA FROM PI
+    # =====================================
 
-    temperature = get_temperature()
+    sensor_data = requests.get(
 
-    height = get_height()
+        "https://feof-upgrades-musical-progressive.trycloudflare.com/sensor"
 
-    # 🍂 AI Disease Detection
+    ).json()
+
+    moisture = sensor_data["moisture"]
+
+    temperature = sensor_data["temperature"]
+
+    humidity = sensor_data["humidity"]
+
+    height = sensor_data["height"]
+
+    # =====================================
+    # 🍂 AI DISEASE DETECTION
+    # =====================================
+
     disease = detect_disease()
 
-    # 🌦️ Weather
+    # =====================================
+    # 🌦️ WEATHER
+    # =====================================
+    city = "sivakasi"
     weather, outside_temp = get_weather(city)
+    
 
-    # 🌾 Harvest
+    if weather.lower() in [
+       "rain",
+       "drizzle",
+       "thunderstorm"
+    ]:
+        rain_alert = "Yes"
+    else:    
+        rain_alert = "No"
+
+    # =====================================
+    # 🌾 HARVEST STATUS
+    # =====================================
+
     harvest = harvest_status(height)
 
-    # 🧪 Fertilizer
+    # =====================================
+    # 🧪 FERTILIZER
+    # =====================================
+
     fertilizer = fertilizer_recommendation(
+
         disease,
+
         moisture
     )
+
+   
+
+
+    # =====================================
+    # RETURN DASHBOARD DATA
+    # =====================================
 
     return jsonify({
 
         "moisture": moisture,
 
         "temperature": temperature,
+
+        "humidity": humidity,
 
         "height": height,
 
@@ -248,13 +297,22 @@ def data():
 
         "fertilizer": fertilizer,
 
-        "city": city
+        "city": city,
+
+        "rain_alert": rain_alert,
     })
 
-# =====================================================
-# ▶️ RUN SERVER
-# =====================================================
+# ============================================
+# RUN SERVER
+# ============================================
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run(
+
+        host="0.0.0.0",
+
+        port=5000,
+
+        debug=True
+    )

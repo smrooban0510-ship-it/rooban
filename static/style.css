@@ -1,40 +1,110 @@
 body{
 
     background:#111827;
+
     color:white;
+
     font-family:Arial;
+
     margin:0;
+
     padding:0;
+
     text-align:center;
 }
 
 h1{
 
     padding:20px;
+
+    color:#22c55e;
 }
+
+/* =========================
+   GRID CONTAINER
+========================= */
 
 .container{
 
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+
     gap:20px;
+
     padding:20px;
 }
+
+/* =========================
+   CARD DESIGN
+========================= */
 
 .card{
 
     background:#1f2937;
+
     padding:20px;
+
     border-radius:15px;
-    box-shadow:0px 0px 10px black;
+
+    box-shadow:0px 0px 15px black;
+
+    transition:0.3s;
 }
+
+.card:hover{
+
+    transform:scale(1.03);
+
+    box-shadow:0px 0px 20px #22c55e;
+}
+
+/* =========================
+   CARD TITLES
+========================= */
 
 .card h2{
 
     margin-bottom:10px;
+
+    color:#22c55e;
 }
 
-.card p{
+/* =========================
+   SENSOR VALUES
+========================= */
 
-    font-size:24px;
+.card h1{
+
+    font-size:28px;
+
+    margin:10px 0;
+}
+
+/* =========================
+   IMAGE
+========================= */
+
+img{
+
+    width:100%;
+
+    max-width:300px;
+
+    border-radius:10px;
+
+    margin-top:10px;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    .container{
+
+        grid-template-columns:1fr;
+    }
 }
